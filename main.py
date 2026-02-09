@@ -3,8 +3,6 @@ import random
 from levels import levels
 from sprites import *
 
-TILE_SIZE = 32
-
 class PacmanGame(arcade.View):
     def __init__(self):
         super().__init__()
@@ -73,8 +71,8 @@ class PacmanGame(arcade.View):
         self.player_list.update()
         self.ghost_list.update()
         self.check_collisions()
-        self.ghost_movement()
         self.win_game()
+        self.ghost_movement()
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.UP:
@@ -119,7 +117,7 @@ class PacmanGame(arcade.View):
                 self.score = 0
                 self.health = 3
             self.setup()
-    
+
     def ghost_movement(self):
         for ghost in self.ghost_list:
             directions = ["up", "down", "left", "right"]
