@@ -1,75 +1,9 @@
 import arcade
 import random
-import time
+from levels import levels
+from sprites import *
 
 TILE_SIZE = 32
-
-levels = {
-    "level1": [
-        "########################",
-        "#..........##..........#",
-        "#.####.###.##.###.####.#",
-        "#P....................G#",
-        "########################",
-    ],
-
-    "level2": [
-        "########################",
-        "#P.......##.......G....#",
-        "#.####.###.##.###.####.#",
-        "#........G.............#",
-        "########################",
-    ],
-
-    "level3": [
-        "########################",
-        "#P.......##.G.....G....#",
-        "#.####.###.##.###.####.#",
-        "#........G..........G..#",
-        "########################",
-    ]
-}
-
-class Character(arcade.Sprite):
-    def __init__(self, speed, x, y, color):
-        super().__init__()
-        radius = TILE_SIZE // 2 - 6
-        self.texture = arcade.load_texture("pacman.png")
-        self.scale = (radius * 2) / self.texture.width
-        self.speed = speed
-        self.center_x = x
-        self.center_y = y
-
-class Wall(arcade.Sprite):
-    def __init__(self, x, y, color):
-        super().__init__()
-        texture = arcade.make_soft_square_texture(TILE_SIZE, color)
-        self.texture = texture
-        self.width = texture.width
-        self.height = texture.height
-        self.center_x = x
-        self.center_y = y
-
-class Coin(arcade.Sprite):
-    def __init__(self, x, y, color):
-        super().__init__()
-        radius = TILE_SIZE // 2 - random.randint(4, 6) # randiomize size slightly
-        texture = arcade.make_circle_texture(radius * 2, color)
-        self.texture = texture
-        self.width = texture.width - 10
-        self.height = texture.height - 10
-        self.center_x = x
-        self.center_y = y
-
-class Ghost(arcade.Sprite):
-    def __init__(self, x, y, color):
-        super().__init__()
-        radius = TILE_SIZE // 2 - 6
-        self.texture = arcade.load_texture("ghost.png")
-        self.scale = (radius * 2) / self.texture.width
-        self.center_x = x
-        self.center_y = y
-        self.last_direction = None
 
 class PacmanGame(arcade.View):
     def __init__(self):
@@ -79,6 +13,8 @@ class PacmanGame(arcade.View):
         self.coin_list = arcade.SpriteList()
         self.ghost_list = arcade.SpriteList()
         self.level = 1
+        self.score = 0
+        self.health = 3
 
         self.drawinings()
     
@@ -129,6 +65,9 @@ class PacmanGame(arcade.View):
         self.coin_list.draw()
         self.ghost_list.draw()
         self.player_list.draw()
+        arcade.draw_text(f"Level: {self.level}", 10, 580, arcade.color.WHITE, 14)
+        arcade.draw_text(f"Score: {self.score}", 10, 560, arcade.color.WHITE, 14)
+        arcade.draw_text(f"Health: {self.health}/3", 10, 540, arcade.color.WHITE, 14)
     
     def on_update(self, delta_time):
         self.player_list.update()
@@ -170,9 +109,15 @@ class PacmanGame(arcade.View):
         coins_in = arcade.check_for_collision_with_list(self.player, self.coin_list)
         for coin in coins_in:
             coin.remove_from_sprite_lists()
+            self.score += 1
         
         ghosts_in = arcade.check_for_collision_with_list(self.player, self.ghost_list)
         if ghosts_in:
+            self.health -= 1
+            if self.health == 0:
+                self.level = 1
+                self.score = 0
+                self.health = 3
             self.setup()
     
     def ghost_movement(self):
@@ -205,8 +150,12 @@ class PacmanGame(arcade.View):
             self.level += 1
             self.setup()
 
-window = arcade.Window(850, 600, "Pacman Game")
-game = PacmanGame()
-game.setup()
-window.show_view(game)
-arcade.run()
+def main():
+    window = arcade.Window(850, 600, "Pacman Game")
+    game = PacmanGame()
+    game.setup()
+    window.show_view(game)
+    arcade.run()
+
+if __name__ == "__main__":
+    main()
