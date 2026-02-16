@@ -1,0 +1,14 @@
+{
+    "General": {
+        "SCREEN_WIDTH": 800,
+        "SCREEN_HEIGHT": 600,
+        "SCREEN_TITLE": "Pacman Game",
+        "TILE_SIZE": 32
+    },
+    "Player": {
+        "DEFAULT_PLAYER_SPEED": 3
+    },
+    "Ghost": {
+        "DEFAULT_GHOST_SPEED": 2
+    }
+}
