@@ -223,6 +223,14 @@ class PacmanGame(arcade.View):
             self.level += 1
             self.setup()
         else:
+            if len(normal_coins) == 0:
+                self.ghost_mode_left = 0.0
+                self.health -= 1
+                if self.health == 0:
+                    self.level = 1
+                    self.score = 0
+                    self.health = 3
+                self.setup()
             players_in = arcade.check_for_collision_with_list(self.mover, self.player_list)
             if players_in:
                 for player in players_in:
