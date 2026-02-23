@@ -2,8 +2,15 @@ import arcade, random, json, time
 from levels import levels
 from sprites import *
 
-with open('game_data.json', 'r') as file:
+with open('config.json', 'r') as file:
     game_data = json.load(file)
+
+with open('data.json', 'r') as file:
+    data = json.load(file)
+
+collect_sound = arcade.load_sound(r"assets/collect.wav")
+win_sound = arcade.load_sound(r"assets/win.wav")
+lose_sound = arcade.load_sound(r"assets/lose.wav")
 
 class PacmanGame(arcade.View):
     def __init__(self):
@@ -71,12 +78,13 @@ class PacmanGame(arcade.View):
         self.coin_list.draw()
         self.ghost_list.draw()
         self.player_list.draw()
+
         arcade.draw_text(f"Level: {self.level}", 10, 580, arcade.color.WHITE, 14)
         arcade.draw_text(f"Score: {self.score}", 10, 560, arcade.color.WHITE, 14)
         arcade.draw_text(f"Health: {self.health}/3", 10, 540, arcade.color.WHITE, 14)
         if self.ghost_mode_left > 0:
             arcade.draw_text(f"Time left being ghost: {round(self.ghost_mode_left)}s", 260, 250, arcade.color.WHITE, 20)
-    
+
     def on_update(self, delta_time):
         self.player_list.update()
         self.ghost_list.update()
@@ -141,10 +149,12 @@ class PacmanGame(arcade.View):
             coin.remove_from_sprite_lists()
             if self.mover == self.player:
                 self.score += 1
+                arcade.play_sound(collect_sound)
             if coin.ghost_charm: # ghost charm
                 self.score += 4
-                self.mover = self.ghost_list[0]
-                self.ghost_list[0].is_player = True
+                selected_ghost = self.ghost_list[0]
+                self.mover = selected_ghost
+                selected_ghost.is_player = True
                 self.player.change_x = 0
                 self.player.change_y = 0
                 self.mover.change_x = 0
@@ -158,6 +168,7 @@ class PacmanGame(arcade.View):
                 self.level = 1
                 self.score = 0
                 self.health = 3
+                arcade.play_sound(lose_sound)
             self.setup()
 
     def ghost_movement(self):
@@ -221,6 +232,7 @@ class PacmanGame(arcade.View):
                 normal_coins.append(coin)
         if len(normal_coins) == 0 and self.mover == self.player:
             self.level += 1
+            arcade.play_sound(win_sound)
             self.setup()
         else:
             if len(normal_coins) == 0:
@@ -230,6 +242,7 @@ class PacmanGame(arcade.View):
                     self.level = 1
                     self.score = 0
                     self.health = 3
+                arcade.play_sound(win_sound)
                 self.setup()
             players_in = arcade.check_for_collision_with_list(self.mover, self.player_list)
             if players_in:
@@ -238,6 +251,7 @@ class PacmanGame(arcade.View):
                         self.score += 25
                         self.level += 1
                         self.ghost_mode_left = 0.0
+                        arcade.play_sound(win_sound)
                         self.setup()
                         break
 

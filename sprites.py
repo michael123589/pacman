@@ -1,6 +1,6 @@
 import arcade, random, json
 
-with open('game_data.json', 'r') as file:
+with open('config.json', 'r') as file:
     game_data = json.load(file)
 
 TILE_SIZE = game_data["General"]["TILE_SIZE"]
@@ -9,7 +9,7 @@ class Character(arcade.Sprite):
     def __init__(self, speed, x, y):
         super().__init__()
         radius = TILE_SIZE // 2 - 6
-        self.texture = arcade.load_texture("pacman.png")
+        self.texture = arcade.load_texture(r"assets/pacman.png")
         self.scale = (radius * 2) / self.texture.width
         self.speed = speed
         self.center_x = x
@@ -41,10 +41,18 @@ class Ghost(arcade.Sprite):
     def __init__(self, x, y, color, speed):
         super().__init__()
         radius = TILE_SIZE // 2 - 6
-        self.texture = arcade.load_texture("ghost.png")
-        self.scale = (radius * 2) / self.texture.width
+        self.texture = arcade.load_texture(r"assets/ghost.png")
+        base = (radius * 2) / self.texture.width
+        self.scale = base
         self.speed = speed
         self.center_x = x
         self.center_y = y
         self.last_direction = None
         self.is_player = False
+    
+    def set_border(self, to):
+        self.border.visible = to
+
+    def border_to_ghost(self):
+        self.border.center_x = self.center_x
+        self.border.center_y = self.center_y
